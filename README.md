@@ -4,9 +4,7 @@
 
 能打开 ChatGPT 的节点才会留下。返回 HTTP 401 或 403 算通过。
 
-## 准备
-
-仓库里没有 Xray 程序。下载 [Xray-core 26.3.27](https://github.com/XTLS/Xray-core/releases/tag/v26.3.27) 的 Linux 64 位版本，解压后把程序放在本目录，文件名必须是 `xray`，然后 `chmod +x xray`。
+目录里已经带了 Linux 64 位的 `xray`，版本是 [Xray-core 26.3.27](https://github.com/XTLS/Xray-core/releases/tag/v26.3.27)。这是上游原版程序，没有改过。克隆或下载后不用再单独下载。
 
 ## 使用
 
