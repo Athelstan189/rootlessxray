@@ -14,7 +14,7 @@
 
 ```bash
 mkdir -p ~/rootlessxray
-nano ~/rootlessxray/subscription
+nano ~/rootlessxray/subscription #或者直接打开subscription复制进去
 source /path/to/rootlessxray/start.sh
 ```
 
@@ -46,6 +46,3 @@ source /disk227/lixingqi/software/rootlessxray/proxy_env.sh
 
 日志在 `/disk227/lixingqi/software/rootlessxray/log/用户名/`。
 
-## 不要提交
-
-订阅地址、`nodes.txt`、`config.json`、端口文件和日志都不进 git。它们在每个人自己的 `~/rootlessxray` 里。
