@@ -30,6 +30,8 @@ XRAY = Path(_bin) if _bin else (KIT / "xray")
 CONFIG = BASE / "config.json"
 NODES = BASE / "nodes.txt"
 PORTS_FILE = BASE / "ports.env"
+APPLIED_FILE = BASE / "applied.json"
+PIN_FILE = BASE / "pin.json"
 
 # Codex actually talks to this endpoint. Override with XRAY_PROBE_URL if needed.
 PROBE_URL = os.environ.get(
@@ -566,7 +568,18 @@ def load_nodes() -> list[dict[str, Any]]:
     return nodes
 
 
-def build_config(working: list[dict[str, Any]]) -> dict[str, Any]:
+def read_pin_name() -> str:
+    """Return the pinned node name, or empty when selection stays automatic."""
+    try:
+        data = json.loads(PIN_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return ""
+    if not isinstance(data, dict) or data.get("mode") != "pin":
+        return ""
+    return str(data.get("name") or "").strip()
+
+
+def build_config(working: list[dict[str, Any]], selector: str = "proxy-") -> dict[str, Any]:
     # Always rebuild inbounds from ports.env so copied kits / custom ports work.
     base: dict[str, Any] = {
         "log": {"loglevel": "warning"},
@@ -604,7 +617,7 @@ def build_config(working: list[dict[str, Any]]) -> dict[str, Any]:
         "balancers": [
             {
                 "tag": "auto",
-                "selector": ["proxy-"],
+                "selector": [selector],
                 "strategy": {"type": "leastPing"},
             }
         ],
@@ -655,8 +668,39 @@ def main() -> int:
         log("NO_WORKING_NODE")
         return 0
 
-    chosen = [n for _, n, _ in (working if MAX_APPLY <= 0 else working[:MAX_APPLY])]
-    cfg = build_config(chosen)
+    ranked = working if MAX_APPLY <= 0 else working[:MAX_APPLY]
+    chosen = [n for _, n, _ in ranked]
+    pin_name = read_pin_name()
+    selector = "proxy-"
+    if pin_name:
+        for i, node in enumerate(chosen, start=1):
+            if (node.get("tag_name") or "") == pin_name:
+                selector = f"proxy-{i:03d}"
+                log(f"PIN\t{selector}\t{pin_name}")
+                break
+        else:
+            log(f"PIN_MISSED\t{pin_name}")
+            pin_name = ""
+    cfg = build_config(chosen, selector)
+    applied_doc = {
+        "mode": "pin" if pin_name else "auto",
+        "pin": pin_name,
+        "nodes": [],
+    }
+    for i, (latency, node, detail) in enumerate(ranked, start=1):
+        tag = f"proxy-{i:03d}"
+        applied_doc["nodes"].append(
+            {
+                "tag": tag,
+                "name": node.get("tag_name") or tag,
+                "protocol": node.get("protocol") or "",
+                "address": node.get("address") or "",
+                "port": node.get("port") or 0,
+                "latency": round(latency, 3),
+                "detail": detail,
+                "active": selector == "proxy-" or tag == selector,
+            }
+        )
     # validate before write
     with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tf:
         json.dump(cfg, tf, ensure_ascii=False, indent=2)
@@ -674,6 +718,14 @@ def main() -> int:
             return 3
         # /tmp and /disk227 are different filesystems; use copy+replace
         shutil.copyfile(tmp_name, CONFIG)
+        APPLIED_FILE.write_text(
+            json.dumps(applied_doc, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        try:
+            os.chmod(APPLIED_FILE, 0o600)
+        except OSError:
+            pass
     finally:
         if os.path.exists(tmp_name):
             try:

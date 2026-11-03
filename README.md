@@ -28,6 +28,16 @@ source /path/to/rootlessxray/proxy_env.sh
 
 换订阅地址时，改 `~/rootlessxray/subscription`，再 `source` 一次 `start.sh`。
 
+## 终端界面
+
+想看测通的节点、固定其中一个，或者改回自动选择：
+
+```bash
+/path/to/rootlessxray/tui.sh
+```
+
+方向键移动。Enter 固定当前节点，`a` 恢复自动选择，`s` 按当前配置启动，`u` 重新拉订阅并探测，`q` 退出。退出后这个终端还要再 `source proxy_env.sh`。
+
 ## 这台机器上
 
 程序已经放在 `/disk227/lixingqi/software/rootlessxray`，`xray` 也在。同学直接：
@@ -42,6 +52,12 @@ source /disk227/lixingqi/software/rootlessxray/start.sh
 
 ```bash
 source /disk227/lixingqi/software/rootlessxray/proxy_env.sh
+```
+
+看节点和固定节点：
+
+```bash
+/disk227/lixingqi/software/rootlessxray/tui.sh
 ```
 
 日志在 `/disk227/lixingqi/software/rootlessxray/log/用户名/`。
