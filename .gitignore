@@ -1,0 +1,15 @@
+# Upstream Xray-core binary. Download the release and save it here as ./xray
+/xray
+/xray.exe
+
+# Subscriptions, nodes, generated config, and per-user runtime files.
+subscription
+nodes.txt
+config.json
+ports.env
+xray.pid
+*.log
+/log/
+
+__pycache__/
+*.pyc
