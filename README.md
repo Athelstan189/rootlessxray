@@ -9,11 +9,12 @@
 ## 使用
 
 把下面命令里的路径换成这份代码所在的目录。
+先打开一个终端
 
 ```bash
 mkdir -p ~/rootlessxray
-nano ~/rootlessxray/subscription #或者直接打开subscription复制进去
-source /path/to/rootlessxray/start.sh
+nano ~/rootlessxray/subscription #或者直接打开subscription把订阅复制进去
+source /path/to/rootlessxray/start.sh #这样就在本终端翻出去了
 ```
 
 `subscription` 里只写一行自己的订阅地址。
