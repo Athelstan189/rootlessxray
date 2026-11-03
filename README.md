@@ -9,6 +9,7 @@
 ## 使用
 
 把下面命令里的路径换成这份代码所在的目录。
+
 先打开一个终端
 
 ```bash
@@ -19,7 +20,7 @@ source /path/to/rootlessxray/start.sh #这样就在本终端翻出去了
 
 `subscription` 里只写一行自己的订阅地址。
 
-新开一个终端时，代理进程还在，只要：
+再新开一个终端时，代理进程还在，只要：
 
 ```bash
 source /path/to/rootlessxray/proxy_env.sh
